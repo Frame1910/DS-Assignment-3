@@ -1,44 +1,43 @@
-import mysql.connector
 import pyfiglet
-
-
-def checkDBExistence():
-    print("Checking for existing database...")
-    cursor.execute("SHOW DATABASES")
-    for database in cursor:
-        print(database)
-        if database[0] == "hpas_data":
-            print("Existing database found!")
-            return True
-    print("No existing database found.")
-    return False
-
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
 
 # Print welcome banner for style points
 welcome_banner = pyfiglet.figlet_format("HPaS Server")
-print("\nWelcome to:\n", welcome_banner)
+print("\nWelcome to:\n", welcome_banner, "Stage 1")
 
-# Authentication of database server
-while True:
-    user_name = "root"  # ! input("Please enter database username:\n")
-    password = "Letmein!1"  # ! input("Please enter database password:\n")
-    try:
-        db = mysql.connector.connect(  # ! Update for submission
-            host="localhost",
-            user=user_name,
-            password=password
-        )
-        break
-    except:
-        print("\n*** Invalid credentials, make sure to use the credentials you used when setting up MySQL.***\n\nPlease try again...")
 
-cursor = db.cursor()
-db_exists = checkDBExistence()
-print(db_exists)
-if db_exists:
-    print("\nReconnecting to existing database...")
-else:
-    print("\nCreating new database...")
-    cursor.execute("CREATE DATABASE hpas_data")
-db.connect(database="hpas_data")
-print("Connected.")
+class RequestHandler(SimpleXMLRPCRequestHandler):
+    rpc_paths = ('/RPC2',)
+
+
+with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as server:
+    server.register_introspection_functions()
+
+    class Evaluator():
+        def __init__(self):
+            pass
+
+        def displayScores(person_info):
+            scores = person_info[1]
+            for score in scores:
+                print(score[0], score[1])
+
+        def calculateGlobalAves():
+            pass
+
+        def twelveHighest():
+            pass
+
+        def calculateTopTwelveAves():
+            pass
+
+        def determineHonours():
+            pass
+
+        def sendResult():
+            pass
+
+    server.register_instance(Evaluator)
+
+    server.serve_forever()
