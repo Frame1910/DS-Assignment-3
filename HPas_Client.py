@@ -32,7 +32,7 @@ def enterUnits():
         unit_result = unit_result.split(",")
         # Convert score into integer for easier comparison later on
         unit_result[1] = int(unit_result[1])
-        if 0 <= unit_result[1] <= 100:  # Check if score is between 0 and 100
+        if 0 > unit_result[1] > 100:  # Check if score is between 0 and 100
             print("Invalid score input, try again.")
             continue
         unit_list.append(unit_result)
@@ -58,4 +58,9 @@ person_details.append(person_id)
 unit_grades = enterUnits()
 # * At this point, the user has a valid ID, and has entered all units correctly
 person_details.append(unit_grades)
-print(person_details)
+
+s.displayScores(person_details)  # Prints scores on server's console
+print("Course Average:", s.calculateGlobalAve(person_details))
+print("Top 12 Scores:", s.twelveHighest(person_details))
+print("Top 12 Average:", s.calculateTopTwelveAves(person_details))
+print("Honours:", s.determineHonours(person_details))
