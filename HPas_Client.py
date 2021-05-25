@@ -14,6 +14,25 @@ def checkFails(units):  # Checks how many failing marks have been entered and re
         return True
 
 
+def validateUnit(existing_units, draft_unit):  # * Validates new unit input
+    # Checks draft unit for errors
+    if draft_unit[1] < 0 or draft_unit[1] > 100:
+        print("Invalid score. Try again.")
+        return False
+    code = draft_unit[0]
+    if not code[0:3].isalpha() or not code[3:6].isnumeric():
+        print("Unit code invalid. Try again.")
+        return False
+    # Checks for previous attempts the draft unit
+    previous_attempts = 0
+    for unit in existing_units:
+        if previous_attempts == 3:
+            return False
+        elif unit[0] == draft_unit[0]:
+            previous_attempts.append(unit)
+    return True
+
+
 def enterUnits():
     # * unit_list = [ [Unit Code, Score], [Unit Code, Score], ...]
     unit_list = []
@@ -36,8 +55,8 @@ def enterUnits():
         except ValueError:
             print("Please enter a number between 0 and 100. Try again.")
             continue
-        if 0 > unit_result[1] > 100:  # Check if score is between 0 and 100
-            print("Invalid score input, try again.")
+        # Unit validation function
+        if not validateUnit(unit_list, unit_result):
             continue
         unit_list.append(unit_result)
     if checkFails(unit_list):
