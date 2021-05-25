@@ -31,7 +31,11 @@ def enterUnits():
         unit_result = unit_result.replace(" ", "")
         unit_result = unit_result.split(",")
         # Convert score into integer for easier comparison later on
-        unit_result[1] = int(unit_result[1])
+        try:
+            unit_result[1] = int(unit_result[1])
+        except ValueError:
+            print("Please enter a number between 0 and 100. Try again.")
+            continue
         if 0 > unit_result[1] > 100:  # Check if score is between 0 and 100
             print("Invalid score input, try again.")
             continue
