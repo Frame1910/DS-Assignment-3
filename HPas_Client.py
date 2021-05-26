@@ -14,21 +14,22 @@ def checkFails(units):  # Checks how many failing marks have been entered and re
         return True
 
 
-# Checks for previous attempts the draft unit
-# ! Does not work, need to clarify logic.
-def checkAttempts(existing_units, draft_unit):
+# Checks that there are less than 4 attempts of a particular unit
+def attempts(existing_units, draft_unit):
     previous_attempts = []
     for unit in existing_units:
         if unit[0] == draft_unit[0]:
-            previous_attempts.append(unit)
+            previous_attempts.append(unit[0])
+    return len(previous_attempts)
+
+
+# Checks how many fails there are for a particular unit
+def existingFails(existing_units, draft_unit):
     fails = 0
-    for unit in previous_attempts:
-        if unit[1] < 50:
+    for unit in existing_units:
+        if unit[0] == draft_unit[0] and unit[1] < 50:
             fails += 1
-    if fails >= 2:
-        print("You've failed",
-              draft_unit[0], "too many times. You do not qualify for Honours.")
-        return False
+    return fails
 
 
 def validateUnitInput(existing_units, draft_unit):  # Validates new unit input
@@ -59,14 +60,28 @@ def enterUnits():
         unit_result = unit_result.replace(" ", "")
         unit_result = unit_result.split(",")
         # Convert score into integer for easier comparison later on
-        try:
+        try:  # ! This code is duplicated in the validateUnit() function (refactor?)
             unit_result[1] = int(unit_result[1])
         except ValueError:
             print("Please enter a number between 0 and 100. Try again.")
             continue
         # Unit validation function
-        if not validateUnitInput(unit_list, unit_result):
-            continue
+        if validateUnitInput(unit_list, unit_result):
+            unit_attempts = attempts(unit_list, unit_result)
+            existing_fails = existingFails(unit_list, unit_result)
+            if unit_attempts == 3:
+                print("You already have three marks entered for this unit")
+                continue
+            elif unit_attempts == 2 and existing_fails == 2:
+                if unit_result[1] < 50:
+                    print(
+                        "You've failed", unit_result[0], "three times, you do not qualify for Honours")
+                    exit()
+            elif unit_attempts == 1 and existing_fails == 0 or unit_attempts == 2 and existing_fails == 1:
+                if unit_result[1] >= 50:
+                    print("You cannot pass one unit more than once.")
+                    continue
+
         unit_list.append(unit_result)
     if checkFails(unit_list):
         return unit_list

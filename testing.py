@@ -1,77 +1,63 @@
-# Mock data variables
-mock_unit_list = [
-    ["CSP0000", 40],
-    ["CSP0000", 40],
-    ["CSP0000", 40],
-    ["CSP0000", 40],
-    ["CSP0001", 40],
-    ["CSP0002", 80],
-    ["CSP0003", 80],
-    ["CSP0004", 80],
-    ["CSP0005", 80],
-    ["CSP0006", 80],
-    ["CSP0007", 80],
-    ["CSP0008", 80],
-    ["CSP0009", 80],
-    ["CSP0010", 80],
-    ["CSP0011", 80],
-    ["CSP0011", 80],
-    ["CSP0011", 80],
-    ["CSP0011", 80]
+# Checks that there are less than 4 attempts of a particular unit
+def attempts(existing_units, draft_unit):
+    previous_attempts = []
+    for unit in existing_units:
+        if unit[0] == draft_unit[0]:
+            previous_attempts.append(unit[0])
+    return len(previous_attempts)
+
+
+# Checks how many fails there are for a particular unit
+def existingFails(existing_units, draft_unit):
+    fails = 0
+    for unit in existing_units:
+        if unit[0] == draft_unit[0] and unit[1] < 50:
+            fails += 1
+    return fails
+
+
+def validateUnitInput(existing_units, draft_unit):  # Validates new unit input
+    # Checks draft unit for errors
+    if draft_unit[1] < 0 or draft_unit[1] > 100:
+        print("Invalid score. Try again.")
+        return False
+    code = draft_unit[0]
+    if not code[0:3].isalpha() or not code[3:6].isnumeric():
+        print("Unit code invalid. Try again.")
+        return False
+    return True
+
+
+unit_list = [
+    ["SCI1125", 82],
+    ["CSP1150", 78],
+    ["MAT1252", 80],
+    ["CSI1241", 85],
+    ["CSG1105", 75],
+    ["CSI1101", 70],
+    ["ENS1161", 90],
+    ["CSG1207", 87],
+    ["CSP2348", 80],
+    ["CSP2104", 77],
+    ["CSG2341", 82],
+    ["CSG2344", 80],
+    ["CSI2312", 35],
+    ["CSP3341", 40],
+    ["CSI2312", 27]
 ]
-mock_person = [
-    "10496696",
-    mock_unit_list
-]
+unit_result = ["CSI2312", 40]
 
 
-class Evaluator():
-    def displayScores(self, person_info):
-        units = person_info[1]
-        for unit in units:
-            print(unit[0], unit[1])
-
-    def calculateGlobalAve(self, person_info):
-        units = person_info[1]
-        total = 0
-        for unit in units:
-            total += unit[1]
-        return round(total/len(units), 2)
-
-    def twelveHighest(self, person_info):
-        scores_array = []
-        units = person_info[1]
-        for unit in units:
-            scores_array.append(unit[1])
-        scores_array.sort(reverse=True)
-        return scores_array[0:12]
-
-    def calculateTopTwelveAves(self, person_info):
-        arr = self.twelveHighest(person_info)
-        total = sum(arr)
-        return round(total/len(arr), 2)
-
-    def determineHonours(self, person_info):
-        global_ave = self.calculateGlobalAve(person_info)
-        top_ave = self.calculateTopTwelveAves(person_info)
-        if global_ave >= 70:
-            return person_info[0] + ", " + str(global_ave) + ", QUALIFIED FOR HONOURS STUDY!"
-        elif global_ave < 70 and top_ave >= 80:
-            return person_info[0] + ", " + str(global_ave) + ", " + str(top_ave) + ", MAY HAVE GOOD CHANCE! Need further assessment!"
-        elif global_ave < 70 and 70 <= top_ave <= 80:
-            return person_info[0] + ", " + str(global_ave) + ", " + str(top_ave) + ", MAY HAVE A CHANCE! Must be carefully reassessed and get the coordinator’s special permission!"
-        elif global_ave < 70 and top_ave < 70:
-            return person_info[0] + ", " + str(global_ave) + ", " + str(top_ave) + ", DOES NOT QUALIFY FOR HONORS STUDY! Try Masters by course work."
-
-    def sendResult(self):
-        pass
-
-
-eval = Evaluator()
-eval.displayScores(mock_person)
-print("Average:", eval.calculateGlobalAve(mock_person))
-for item in eval.twelveHighest(mock_person):
-    print(item)
-
-print(eval.calculateTopTwelveAves(mock_person))
-print(eval.determineHonours(mock_person))
+if validateUnitInput(unit_list, unit_result):
+    unit_attempts = attempts(unit_list, unit_result)
+    existing_fails = existingFails(unit_list, unit_result)
+    if unit_attempts == 3:
+        print("You already have three marks entered for this unit")
+    elif unit_attempts == 2 and existing_fails == 2:
+        if unit_result[1] < 50:
+            print(
+                "You've failed", unit_result[0], "three times, you do not qualify for Honours")
+            exit()
+    elif unit_attempts == 1 and existing_fails == 0 or unit_attempts == 2 and existing_fails == 1:
+        if unit_result[1] >= 50:
+            print("You cannot pass one unit more than once.")
