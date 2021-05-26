@@ -3,6 +3,7 @@
 import mysql.connector
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
+from mysql.connector import cursor
 
 from mysql.connector.errors import ProgrammingError
 
@@ -13,7 +14,7 @@ class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/RPC2',)
 
 
-class Database():
+class Database():  # * Goal of the Database class is to provide an interface for server-1 to interact with the MySQL database server (server-2)
     # * Goal of the constructor is to make sure a useable database is ready for use as well provide the rest of the class with a cursor object to execute queries
     def __init__(self, user, pwd, host="localhost", db="student_records"):
         try:
@@ -48,19 +49,33 @@ class Database():
         cursor.execute(
             "CREATE TABLE units (code varchar(255) PRIMARY KEY)")
         cursor.execute(
-            "CREATE TABLE grades (id int, code varchar(255), mark int NOT NULL, PRIMARY KEY (id, code))")
+            "CREATE TABLE grades (id varchar(8), code varchar(255), mark int NOT NULL, PRIMARY KEY (id, code))")
         cursor.execute(
             "ALTER TABLE grades ADD FOREIGN KEY (id) REFERENCES students (id)")
         cursor.execute(
             "ALTER TABLE grades ADD FOREIGN KEY (code) REFERENCES units (code)")
         return cursor
 
+    def addStudent(self, id):  # TODO: Write method to add student record to database
+        pass
+
+    def addUnit(self, code):  # TODO: Write method to add unit record to database
+        pass
+
+    def addGrade(self, id, code, grades):  # TODO: Write method to add grade record to database
+        pass
+
     # * Checks how many unit grades a given student has
     def checkUnitCount(self, user_id):
-        return self.cursor.execute("SELECT * FROM grades WHERE id =" + str(user_id))
+        self.cursor.execute(
+            "SELECT * FROM grades WHERE id ='" + str(user_id) + "'")
+        return len(cursor)
 
-    def addGrades(self):
-        pass
+    def queryDB(self, table, attr=None, var=None, column="*"):
+        if attr is None and var is None:
+            return self.cursor.execute("SELECT " + column + " FROM " + table)
+        else:
+            return self.cursor.execute("SELECT " + column + " FROM " + table + " WHERE " + attr + "=" + str(var))
 
 
 db = Database("root", "Letmein!1")
@@ -109,5 +124,13 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
         elif global_ave < 70 and top_ave < 70:
             return person_info[0] + ", " + str(global_ave) + ", " + str(top_ave) + ", DOES NOT QUALIFY FOR HONORS STUDY! Try Masters by course work."
     server.register_function(determineHonours)
+
+    def isExistingStudent(id):
+        results = db.queryDB("students", "id", id)
+        if len(results) == 0:
+            return False
+        elif len(results) == 1:
+            return True
+
     print("Server is running.")
     # server.serve_forever()
