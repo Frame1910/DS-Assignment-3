@@ -33,9 +33,13 @@ def existingFails(existing_units, draft_unit):
 
 
 def validateUnitInput(existing_units, draft_unit):  # Validates new unit input
-    # Checks draft unit for errors
-    if draft_unit[1] < 0 or draft_unit[1] > 100:
-        print("Invalid score. Try again.")
+    # Convert score into integer for easier comparison later on
+    try:
+        draft_unit[1] = int(draft_unit[1])
+        if draft_unit[1] < 0 or draft_unit[1] > 100:
+            raise(ValueError)
+    except ValueError:
+        print("Please enter a number between 0 and 100. Try again.")
         return False
     code = draft_unit[0]
     if not code[0:3].isalpha() or not code[3:6].isnumeric():
@@ -59,14 +63,9 @@ def enterUnits():
         # Remove spaces and split unit code/score input into "code,score" for pre-processing
         unit_result = unit_result.replace(" ", "")
         unit_result = unit_result.split(",")
-        # Convert score into integer for easier comparison later on
-        try:  # ! This code is duplicated in the validateUnit() function (refactor?)
-            unit_result[1] = int(unit_result[1])
-        except ValueError:
-            print("Please enter a number between 0 and 100. Try again.")
-            continue
         # Unit validation function
         if validateUnitInput(unit_list, unit_result):
+            unit_result[1] = int(unit_result[1])
             unit_attempts = attempts(unit_list, unit_result)
             existing_fails = existingFails(unit_list, unit_result)
             if unit_attempts == 3:
