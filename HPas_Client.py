@@ -32,6 +32,15 @@ def existingFails(existing_units, draft_unit):
     return fails
 
 
+def validateID():  # * Validates that an entered ID is 8 characters long and is numeric. However, it keeps it as a string to keep trailing zeros
+    while True:
+        id = input("Please enter your ID: ")
+        if len(id) == 8 and id.isnumeric():
+            return id
+        else:
+            print("Invalid ID. Try again.")
+
+
 def validateUnitInput(existing_units, draft_unit):  # Validates new unit input
     # Checks draft unit for errors
     if draft_unit[1] < 0 or draft_unit[1] > 100:
@@ -97,7 +106,7 @@ try:
 except:
     print("Could not connect to server.")
 
-person_id = input("Please enter your ID: ")
+person_id = validateID()
 # * person_details is a 2-dimensional array which stores an ID in index 0, with index 1 containing another array; unit_list
 # * person_details: [ ID, unit_list ]
 person_details = []
@@ -105,9 +114,3 @@ person_details.append(person_id)
 unit_grades = enterUnits()
 # * At this point, the user has a valid ID, and has entered all units correctly
 person_details.append(unit_grades)
-
-s.displayScores(person_details)  # Prints scores on server's console
-print("Course Average:", s.calculateGlobalAve(person_details))
-print("Top 12 Scores:", s.twelveHighest(person_details))
-print("Top 12 Average:", s.calculateTopTwelveAves(person_details))
-print("Honours:", s.determineHonours(person_details))
