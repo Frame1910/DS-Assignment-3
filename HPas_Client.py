@@ -119,7 +119,7 @@ try:
     if address == "":
         s = xmlrpc.client.ServerProxy('http://0.0.0.0:8000')
     else:
-        s = xmlrpc.client.ServerProxy(address)
+        s = xmlrpc.client.ServerProxy("http://" + address + ":8000")
     print("Connected to server.")
 except:
     print("Could not connect to server.")
