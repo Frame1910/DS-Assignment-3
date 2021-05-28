@@ -82,7 +82,12 @@ class Database():  # Goal of the Database class is to provide an interface for s
         print(self.cursor.rowcount, "record(s) deleted")
 
 
-db = Database("root", "Letmein!1")  # Instantiate Database interface object
+user = input("Enter MySQL Server username (leave blank for root user): ")
+if user == "":
+    user = "root"
+password = input("Enter MySQL Server password (leave blank for no password): ")
+
+db = Database(user, password)  # Instantiate Database interface object
 with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as server:
     server.register_introspection_functions()
 
