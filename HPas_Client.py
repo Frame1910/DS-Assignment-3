@@ -72,35 +72,39 @@ def enterUnits():
     # * unit_list = [ [Unit Code, Score], [Unit Code, Score], ...]
     unit_list = []
     while len(unit_list) < 30:
-        print("Number of units entered:", str(len(unit_list)) + "/30")
-        unit_result = input(
-            "Please enter your unit information e.g. 'CSI3106, 75' or type exit:\n")
-        if unit_result == "exit":
-            if len(unit_list) < 12:
-                print("Minimum of 12 units is required.")
-                continue
-            break
-        # Remove spaces and split unit code/score input into "code,score" for pre-processing
-        unit_result = unit_result.replace(" ", "")
-        unit_result = unit_result.split(",")
-        # Unit validation function
-        if validateUnitInput(unit_list, unit_result):
-            unit_result[1] = int(unit_result[1])
-            unit_attempts = attempts(unit_list, unit_result)
-            existing_fails = existingFails(unit_list, unit_result)
-            if unit_attempts == 3:
-                print("You already have three marks entered for this unit")
-                continue
-            elif unit_attempts == 2 and existing_fails == 2:
-                if unit_result[1] < 50:
-                    print(
-                        "You've failed", unit_result[0], "three times, you do not qualify for Honours")
-                    exit()
-            elif unit_attempts == 1 and existing_fails == 0 or unit_attempts == 2 and existing_fails == 1:
-                if unit_result[1] >= 50:
-                    print("You cannot pass one unit more than once.")
+        try:
+            print("Number of units entered:", str(len(unit_list)) + "/30")
+            unit_result = input(
+                "Please enter your unit information e.g. 'CSI3106, 75' or type exit:\n")
+            if unit_result == "exit":
+                if len(unit_list) < 12:
+                    print("Minimum of 12 units is required.")
                     continue
-            unit_list.append(unit_result)
+                break
+            # Remove spaces and split unit code/score input into "code,score" for pre-processing
+            unit_result = unit_result.replace(" ", "")
+            unit_result = unit_result.split(",")
+            # Unit validation function
+            if validateUnitInput(unit_list, unit_result):
+                unit_result[1] = int(unit_result[1])
+                unit_attempts = attempts(unit_list, unit_result)
+                existing_fails = existingFails(unit_list, unit_result)
+                if unit_attempts == 3:
+                    print("You already have three marks entered for this unit")
+                    continue
+                elif unit_attempts == 2 and existing_fails == 2:
+                    if unit_result[1] < 50:
+                        print(
+                            "You've failed", unit_result[0], "three times, you do not qualify for Honours")
+                        exit()
+                elif unit_attempts == 1 and existing_fails == 0 or unit_attempts == 2 and existing_fails == 1:
+                    if unit_result[1] >= 50:
+                        print("You cannot pass one unit more than once.")
+                        continue
+                unit_list.append(unit_result)
+        except:
+            print("Invalid input. Try again.")
+            continue
     if checkFails(unit_list):
         return unit_list
     else:
