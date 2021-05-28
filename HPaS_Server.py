@@ -83,11 +83,13 @@ class Database():  # Goal of the Database class is to provide an interface for s
 
 
 user = input("Enter MySQL Server username (leave blank for root user): ")
-if user == "":
+if user == "dev":
+    pass
+elif user == "":
     user = "root"
-password = input("Enter MySQL Server password (leave blank for no password): ")
-
-db = Database(user, password)  # Instantiate Database interface object
+    password = input(
+        "Enter MySQL Server password (leave blank for no password): ")
+    db = Database(user, password)  # Instantiate Database interface object
 with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as server:
     server.register_introspection_functions()
 
