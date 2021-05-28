@@ -125,19 +125,19 @@ if s.isExistingStudent(person_id):
     choice = yesNoInput(
         "Would you like to use your existing data for the honours pre-assessment?")
     if choice:
-        unit_grades = s.getGrades(person_id)
+        unit_list = s.getGrades(person_id)
     else:
-        unit_grades = enterUnits()
+        unit_list = enterUnits()
         save = yesNoInput(
             "Would you like to save these results in the HPaS Database?")
 else:
-    unit_grades = enterUnits()
+    unit_list = enterUnits()
     save = yesNoInput(
         "Would you like to save these results in the HPaS Database?")
 
 # * At this point, the user has a valid ID, and has entered all units correctly
 person_details.append(person_id)
-person_details.append(unit_grades)
+person_details.append(unit_list)
 if save:
     s.saveAll(person_details)
 honours_result = s.determineHonours(person_details)

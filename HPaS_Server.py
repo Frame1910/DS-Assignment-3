@@ -62,13 +62,6 @@ class Database():  # * Goal of the Database class is to provide an interface for
         result = self.cursor.fetchall()
         return result
 
-    def addGrade(self, id, code, grade):  # * Method to add grade record to database SINGLE ENTRY
-        sql = 'INSERT INTO grades (student_id, code, mark) VALUES (%s, %s, %s)'
-        values = (id, code, grade)
-        self.cursor.execute(sql, values)
-        self.cnx.commit()
-        print(self.cursor.rowcount, "records inserted.")
-
     def addGrades(self, person_details):  # * Method to add grade record to database BATCH ENTRY
         sql = 'INSERT INTO grades (student_id, code, mark) VALUES (%s, %s, %s)'
         values = []
@@ -80,15 +73,6 @@ class Database():  # * Goal of the Database class is to provide an interface for
         self.cursor.executemany(sql, values)
         self.cnx.commit()
         print(self.cursor.rowcount, "records inserted.")
-
-    # Checks how many unit grades a given student has
-    def checkUnitCount(self, user_id):
-        self.cursor.execute(
-            "SELECT * FROM grades WHERE id ='" + str(user_id) + "'")
-        return len(cursor)
-
-    def addNewUnits(self, person_details):
-        pass
 
 
 db = Database("root", "Letmein!1")
