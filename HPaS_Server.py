@@ -56,11 +56,20 @@ class Database():  # * Goal of the Database class is to provide an interface for
             "ALTER TABLE grades ADD FOREIGN KEY (code) REFERENCES units (code)")
         return cursor
 
-    def addStudent(self, id):  # TODO: Write method to add student record to database
-        pass
+    def getGrades(self, id):  # TODO: method to fetch a list of all grades for a particular student
+        return cursor.execute("SELECT * FROM grades WHERE id=" + id)
 
-    def addUnit(self, code):  # TODO: Write method to add unit record to database
-        pass
+    def addStudent(self, student_id):  # Method to add student record to database
+        sql = 'INSERT INTO students (id) VALUES ("' + student_id + '")'
+        self.cursor.execute(sql)
+        self.cnx.commit()
+        print(self.cursor.rowcount, "record inserted.")
+
+    def addUnit(self, unit_code):  # Method to add unit record to database
+        sql = 'INSERT INTO units (code) VALUES ("' + unit_code + '")'
+        self.cursor.execute(sql)
+        self.cnx.commit()
+        print(self.cursor.rowcount, "record inserted.")
 
     def addGrade(self, id, code, grades):  # TODO: Write method to add grade record to database
         pass
@@ -71,6 +80,7 @@ class Database():  # * Goal of the Database class is to provide an interface for
             "SELECT * FROM grades WHERE id ='" + str(user_id) + "'")
         return len(cursor)
 
+    # ! Experimental modular method for queries
     def queryDB(self, table, attr=None, var=None, column="*"):
         if attr is None and var is None:
             return self.cursor.execute("SELECT " + column + " FROM " + table)
@@ -131,6 +141,26 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
             return False
         elif len(results) == 1:
             return True
+    server.register_function(isExistingStudent)
 
-    print("Server is running.")
-    # server.serve_forever()
+    def getGrades(id):  # TODO: Gets grades for a particular student
+        unit_list = []
+        db_grades = db.getGrades(id)
+
+    dev = True  # ! Developer mode for db management and testing ===============
+    if dev:
+        print("Developer mode active.")
+        while True:
+            choice = input("Choose function: ")
+            if choice == "exit":
+                break
+            elif choice == "addUnit":
+                param = input("param: ")
+                db.addUnit(param)
+            elif choice == "addStudent":
+                param = input("param: ")
+                db.addStudent(param)
+    # ! End developer area =======================================================
+    else:
+        print("Server is running.")
+        server.serve_forever()
