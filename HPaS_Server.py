@@ -30,6 +30,7 @@ class Database():  # * Goal of the Database class is to provide an interface for
 
     # * Generates a new student_records database from scratch and returns a db cursor to execute queries
     def generateDatabase(self, user, pwd, host="localhost", db="student_records"):
+        print("Generating database...")
         self.cnx = mysql.connector.connect(
             user=user,
             password=pwd,
@@ -45,16 +46,15 @@ class Database():  # * Goal of the Database class is to provide an interface for
             database=db
         )
         cursor = self.cnx.cursor()
-        cursor.execute("CREATE TABLE students (id int PRIMARY KEY)")
         cursor.execute(
-            "CREATE TABLE units (code varchar(255) PRIMARY KEY)")
-        cursor.execute(
-            "CREATE TABLE grades (id varchar(8), code varchar(255), mark int NOT NULL, PRIMARY KEY (id, code))")
-        cursor.execute(
-            "ALTER TABLE grades ADD FOREIGN KEY (id) REFERENCES students (id)")
-        cursor.execute(
-            "ALTER TABLE grades ADD FOREIGN KEY (code) REFERENCES units (code)")
+            "CREATE TABLE grades (id int PRIMARY KEY AUTO_INCREMENT, student_id varchar(8) NOT NULL, code varchar(6) NOT NULL, mark int NOT NULL)")
         return cursor
+
+    def queryStudent(self, id):
+        sql = "SELECT student_id FROM grades WHERE id=" + id
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        return result
 
     def getGrades(self, id):  # Method to fetch a list of all grades for a particular student
         sql = 'SELECT * FROM grades WHERE id=' + id
@@ -62,25 +62,7 @@ class Database():  # * Goal of the Database class is to provide an interface for
         result = self.cursor.fetchall()
         return result
 
-    def addStudent(self, student_id):  # Method to add student record to database
-        sql = 'INSERT INTO students (id) VALUES ("' + student_id + '")'
-        self.cursor.execute(sql)
-        self.cnx.commit()
-        print(self.cursor.rowcount, "record inserted.")
-
-    def queryStudent(self, student_id):
-        sql = 'SELECT * FROM students WHERE id=' + student_id
-        self.cursor.execute(sql)
-        result = self.cursor.fetchall()
-        return result
-
-    def addUnit(self, unit_code):  # Method to add unit record to database
-        sql = 'INSERT INTO units (code) VALUES ("' + unit_code + '")'
-        self.cursor.execute(sql)
-        self.cnx.commit()
-        print(self.cursor.rowcount, "record inserted.")
-
-    def addGrade(self, id, code, grade):  # ! Method to add grade record to database SINGLE ENTRY
+    def addGrade(self, id, code, grade):  # * Method to add grade record to database SINGLE ENTRY
         sql = 'INSERT INTO grades (id, code, mark) VALUES (%s, %s, %s)'
         values = (id, code, grade)
         self.cursor.execute(sql, values)
@@ -165,11 +147,10 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
 
     def isExistingStudent(id):
         results = db.queryStudent(id)
-        print(results)
-        if len(results) == 0:
-            return False
-        elif len(results) == 1:
+        if len(results) > 0:
             return True
+        else:
+            return False
     server.register_function(isExistingStudent)
 
     def getGrades(id):  # Gets grades for a particular student
@@ -180,19 +161,16 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
         db.addGrades(person_details)
     server.register_function(saveAll)
 
-    dev = False  # ! Developer mode for db management and testing ===============
+    dev = False
+    inpt = input("Dev? ")
+    if inpt == "y":
+        dev = True  # ! Developer mode for db management and testing ===============
     if dev:
         print("Developer mode active.")
         while True:
             choice = input("Choose function: ")
             if choice == "exit":
                 break
-            elif choice == "addUnit":
-                param = input("param: ")
-                db.addUnit(param)
-            elif choice == "addStudent":
-                param = input("param: ")
-                db.addStudent(param)
             elif choice == "addGrade":
                 param1 = input("ID: ")
                 param2 = input("Unit Code: ")
@@ -202,6 +180,10 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
                 param = input("ID: ")
                 grades = db.getGrades(param)
                 print(grades)
+            elif choice == "checkStudent":
+                param = input("ID: ")
+                exists = isExistingStudent(param)
+                print(exists)
 
     # ! End developer area =======================================================
     else:
