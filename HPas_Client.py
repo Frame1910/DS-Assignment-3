@@ -55,7 +55,7 @@ def validateID():  # Validates that an entered ID is 8 characters long and is nu
 def validateUnitInput(existing_units, draft_unit):  # Validates new unit input
     # Convert score into integer for easier comparison later on
     try:
-        draft_unit[1] = int(draft_unit[1])
+        draft_unit[1] = float(draft_unit[1])
         if draft_unit[1] < 0 or draft_unit[1] > 100:
             raise(ValueError)
     except ValueError:
@@ -86,7 +86,7 @@ def enterUnits():
             unit_result = unit_result.split(",")
             # Unit validation function
             if validateUnitInput(unit_list, unit_result):
-                unit_result[1] = int(unit_result[1])
+                unit_result[1] = float(unit_result[1])
                 unit_attempts = attempts(unit_list, unit_result)
                 existing_fails = existingFails(unit_list, unit_result)
                 if unit_attempts == 3:
