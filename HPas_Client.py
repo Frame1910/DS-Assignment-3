@@ -96,7 +96,7 @@ def enterUnits():
                     if unit_result[1] < 50:
                         print(
                             "You've failed", unit_result[0], "three times, you do not qualify for Honours")
-                        exit()
+                        return 0
                 elif unit_attempts == 1 and existing_fails == 0 or unit_attempts == 2 and existing_fails == 1:
                     if unit_result[1] >= 50:
                         print("You cannot pass one unit more than once.")
@@ -136,10 +136,14 @@ if s.isExistingStudent(person_id):
         unit_list = s.getGrades(person_id)
     else:
         unit_list = enterUnits()
+        if unit_list == 0:
+            exit()
         save = yesNoInput(
             "Would you like to update the results in the HPaS Database with these new ones?")
 else:
     unit_list = enterUnits()
+    if unit_list == 0:
+            exit()
     save = yesNoInput(
         "Would you like to save these results in the HPaS Database?")
 
