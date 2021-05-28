@@ -47,7 +47,7 @@ class Database():  # Goal of the Database class is to provide an interface for s
         )
         cursor = self.cnx.cursor()
         cursor.execute(
-            "CREATE TABLE grades (id int PRIMARY KEY AUTO_INCREMENT, student_id varchar(8) NOT NULL, code varchar(7) NOT NULL, mark float NOT NULL)")
+            "CREATE TABLE grades (id int PRIMARY KEY AUTO_INCREMENT, student_id varchar(8) NOT NULL, code varchar(7) NOT NULL, mark double(4, 2) NOT NULL)")
         return cursor  # Cursor is used to execute SQL code throughout the class methods
 
     # Finds all references of a student ID in the database.
