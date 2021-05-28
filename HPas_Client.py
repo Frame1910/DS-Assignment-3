@@ -105,11 +105,25 @@ try:
 except:
     print("Could not connect to server.")
 
-person_id = validateID()
 # * person_details is a 2-dimensional array which stores an ID in index 0, with index 1 containing another array; unit_list
 # * person_details: [ ID, unit_list ]
 person_details = []
+
+person_id = validateID()
+if s.isExistingStudent(person_id):
+    while True:
+        choice = input(
+            "Would you like to use your existing data for the honours pre-assessment? (y/n)")
+        if choice == "y":
+            # ? Function to get data from server
+            unit_grades = s.getGrades(person_id)
+            break
+        elif choice == "n":
+            break
+        else:
+            print("Invalid input, enter 'y' or 'n'.")
 person_details.append(person_id)
 unit_grades = enterUnits()
+
 # * At this point, the user has a valid ID, and has entered all units correctly
 person_details.append(unit_grades)
