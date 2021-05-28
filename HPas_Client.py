@@ -8,7 +8,7 @@ def checkFails(units):  # Checks how many failing marks have been entered and re
     for unit in units:
         if unit[1] < 50:
             fails += 1
-    if fails > 6:
+    if fails >= 6:
         return False
     else:
         return True
@@ -85,7 +85,7 @@ def enterUnits():
     if checkFails(unit_list):
         return unit_list
     else:
-        print("You have failed more than 6 of your units, you do not qualify for Honours.")
+        print("You have failed 6 or more of your units, you do not qualify for Honours.")
         exit()
 
 
