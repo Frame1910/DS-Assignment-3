@@ -100,8 +100,7 @@ def enterUnits():
                 if unit_result[1] >= 50:
                     print("You cannot pass one unit more than once.")
                     continue
-
-        unit_list.append(unit_result)
+            unit_list.append(unit_result)
     if checkFails(unit_list):
         return unit_list
     else:
@@ -111,7 +110,7 @@ def enterUnits():
 
 print("Welcome to the Honours Pre-assessment System (HPaS)")
 try:
-    s = xmlrpc.client.ServerProxy('http://localhost:8000')
+    s = xmlrpc.client.ServerProxy('http://0.0.0.0:8000')
     print("Connected to server.")
 except:
     print("Could not connect to server.")
