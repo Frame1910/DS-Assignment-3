@@ -3,6 +3,17 @@
 import xmlrpc.client
 
 
+def yesNoInput(msg):
+    while True:
+        choice = input(msg + " (y/n): ")
+        if choice == "y":
+            return True
+        elif choice == "n":
+            return False
+        else:
+            print("Please enter y or n. Try again.")
+
+
 def checkFails(units):  # Checks how many failing marks have been entered and returns a Boolean value based on result
     fails = 0
     for unit in units:
@@ -111,19 +122,22 @@ person_details = []
 
 person_id = validateID()
 if s.isExistingStudent(person_id):
-    while True:
-        choice = input(
-            "Would you like to use your existing data for the honours pre-assessment? (y/n)")
-        if choice == "y":
-            # ? Function to get data from server
-            unit_grades = s.getGrades(person_id)
-            break
-        elif choice == "n":
-            break
-        else:
-            print("Invalid input, enter 'y' or 'n'.")
-person_details.append(person_id)
-unit_grades = enterUnits()
+    choice = yesNoInput(
+        "Would you like to use your existing data for the honours pre-assessment?")
+    if choice:
+        unit_grades = s.getGrades(person_id)
+    else:
+        unit_grades = enterUnits()
+        save = yesNoInput(
+            "Would you like to save these results in the HPaS Database?")
+else:
+    unit_grades = enterUnits()
+    save = yesNoInput(
+        "Would you like to save these results in the HPaS Database?")
 
 # * At this point, the user has a valid ID, and has entered all units correctly
+person_details.append(person_id)
 person_details.append(unit_grades)
+if save:
+    s.saveAll(person_details)
+s.determineHonours(person_details)

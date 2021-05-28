@@ -56,8 +56,11 @@ class Database():  # * Goal of the Database class is to provide an interface for
             "ALTER TABLE grades ADD FOREIGN KEY (code) REFERENCES units (code)")
         return cursor
 
-    def getGrades(self, id):  # TODO: method to fetch a list of all grades for a particular student
-        return cursor.execute("SELECT * FROM grades WHERE id=" + id)
+    def getGrades(self, id):  # Method to fetch a list of all grades for a particular student
+        sql = 'SELECT * FROM grades WHERE id=' + id
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        return result
 
     def addStudent(self, student_id):  # Method to add student record to database
         sql = 'INSERT INTO students (id) VALUES ("' + student_id + '")'
@@ -65,33 +68,56 @@ class Database():  # * Goal of the Database class is to provide an interface for
         self.cnx.commit()
         print(self.cursor.rowcount, "record inserted.")
 
+    def queryStudent(self, student_id):
+        sql = 'SELECT * FROM students WHERE id=' + student_id
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        return result
+
     def addUnit(self, unit_code):  # Method to add unit record to database
         sql = 'INSERT INTO units (code) VALUES ("' + unit_code + '")'
         self.cursor.execute(sql)
         self.cnx.commit()
         print(self.cursor.rowcount, "record inserted.")
 
-    def addGrade(self, id, code, grades):  # TODO: Write method to add grade record to database
-        pass
+    def addGrade(self, id, code, grade):  # ! Method to add grade record to database SINGLE ENTRY
+        sql = 'INSERT INTO grades (id, code, mark) VALUES (%s, %s, %s)'
+        values = (id, code, grade)
+        self.cursor.execute(sql, values)
+        self.cnx.commit()
+        print(self.cursor.rowcount, "records inserted.")
 
-    # * Checks how many unit grades a given student has
+    def addGrades(self, person_details):  # * Method to add grade record to database BATCH ENTRY
+        sql = 'INSERT INTO grades (id, code, mark) VALUES (%s, %s, %s)'
+        values = []
+        id = person_details[0]
+        unit_list = person_details[1]
+        for unit in unit_list:
+            values.append((id, unit[0], unit[1]))
+
+        self.cursor.executemany(sql, values)
+        self.cnx.commit()
+        print(self.cursor.rowcount, "records inserted.")
+
+        self.cursor.execute(sql, values)
+        self.cnx.commit()
+        print(self.cursor.rowcount, "records inserted.")
+
+    # Checks how many unit grades a given student has
     def checkUnitCount(self, user_id):
         self.cursor.execute(
             "SELECT * FROM grades WHERE id ='" + str(user_id) + "'")
         return len(cursor)
 
-    # ! Experimental modular method for queries
-    def queryDB(self, table, attr=None, var=None, column="*"):
-        if attr is None and var is None:
-            return self.cursor.execute("SELECT " + column + " FROM " + table)
-        else:
-            return self.cursor.execute("SELECT " + column + " FROM " + table + " WHERE " + attr + "=" + str(var))
+    def addNewUnits(self, person_details):
+        pass
 
 
 db = Database("root", "Letmein!1")
 with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as server:
     server.register_introspection_functions()
 
+    # * Stage 1 Methods ===================================
     def displayScores(person_info):
         units = person_info[1]
         for unit in units:
@@ -135,19 +161,26 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
             return person_info[0] + ", " + str(global_ave) + ", " + str(top_ave) + ", DOES NOT QUALIFY FOR HONORS STUDY! Try Masters by course work."
     server.register_function(determineHonours)
 
+    # * Stage 2 methods ===================================
+
     def isExistingStudent(id):
-        results = db.queryDB("students", "id", id)
+        results = db.queryStudent(id)
+        print(results)
         if len(results) == 0:
             return False
         elif len(results) == 1:
             return True
     server.register_function(isExistingStudent)
 
-    def getGrades(id):  # TODO: Gets grades for a particular student
-        unit_list = []
-        db_grades = db.getGrades(id)
+    def getGrades(id):  # Gets grades for a particular student
+        return db.getGrades(id)
+    server.register_function(getGrades)
 
-    dev = True  # ! Developer mode for db management and testing ===============
+    def saveAll(person_details):  # Saves new student data to database
+        db.addGrades(person_details)
+    server.register_function(saveAll)
+
+    dev = False  # ! Developer mode for db management and testing ===============
     if dev:
         print("Developer mode active.")
         while True:
@@ -160,6 +193,16 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
             elif choice == "addStudent":
                 param = input("param: ")
                 db.addStudent(param)
+            elif choice == "addGrade":
+                param1 = input("ID: ")
+                param2 = input("Unit Code: ")
+                param3 = input("Grade: ")
+                db.addGrade(param1, param2, param3)
+            elif choice == "getGrades":
+                param = input("ID: ")
+                grades = db.getGrades(param)
+                print(grades)
+
     # ! End developer area =======================================================
     else:
         print("Server is running.")
