@@ -119,8 +119,8 @@ except:
 # * person_details is a 2-dimensional array which stores an ID in index 0, with index 1 containing another array; unit_list
 # * person_details: [ ID, unit_list ]
 person_details = []
-
 person_id = validateID()
+save = False
 if s.isExistingStudent(person_id):
     choice = yesNoInput(
         "Would you like to use your existing data for the honours pre-assessment?")
@@ -140,4 +140,5 @@ person_details.append(person_id)
 person_details.append(unit_grades)
 if save:
     s.saveAll(person_details)
-s.determineHonours(person_details)
+honours_result = s.determineHonours(person_details)
+print(honours_result)

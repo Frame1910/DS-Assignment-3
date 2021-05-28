@@ -47,30 +47,30 @@ class Database():  # * Goal of the Database class is to provide an interface for
         )
         cursor = self.cnx.cursor()
         cursor.execute(
-            "CREATE TABLE grades (id int PRIMARY KEY AUTO_INCREMENT, student_id varchar(8) NOT NULL, code varchar(6) NOT NULL, mark int NOT NULL)")
+            "CREATE TABLE grades (id int PRIMARY KEY AUTO_INCREMENT, student_id varchar(8) NOT NULL, code varchar(7) NOT NULL, mark int NOT NULL)")
         return cursor
 
     def queryStudent(self, id):
-        sql = "SELECT student_id FROM grades WHERE id=" + id
+        sql = "SELECT student_id FROM grades WHERE student_id=" + id
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         return result
 
     def getGrades(self, id):  # Method to fetch a list of all grades for a particular student
-        sql = 'SELECT * FROM grades WHERE id=' + id
+        sql = 'SELECT code, mark FROM grades WHERE student_id=' + id
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         return result
 
     def addGrade(self, id, code, grade):  # * Method to add grade record to database SINGLE ENTRY
-        sql = 'INSERT INTO grades (id, code, mark) VALUES (%s, %s, %s)'
+        sql = 'INSERT INTO grades (student_id, code, mark) VALUES (%s, %s, %s)'
         values = (id, code, grade)
         self.cursor.execute(sql, values)
         self.cnx.commit()
         print(self.cursor.rowcount, "records inserted.")
 
     def addGrades(self, person_details):  # * Method to add grade record to database BATCH ENTRY
-        sql = 'INSERT INTO grades (id, code, mark) VALUES (%s, %s, %s)'
+        sql = 'INSERT INTO grades (student_id, code, mark) VALUES (%s, %s, %s)'
         values = []
         id = person_details[0]
         unit_list = person_details[1]
@@ -78,10 +78,6 @@ class Database():  # * Goal of the Database class is to provide an interface for
             values.append((id, unit[0], unit[1]))
 
         self.cursor.executemany(sql, values)
-        self.cnx.commit()
-        print(self.cursor.rowcount, "records inserted.")
-
-        self.cursor.execute(sql, values)
         self.cnx.commit()
         print(self.cursor.rowcount, "records inserted.")
 
@@ -154,7 +150,8 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
     server.register_function(isExistingStudent)
 
     def getGrades(id):  # Gets grades for a particular student
-        return db.getGrades(id)
+        grades = db.getGrades(id)
+        return grades
     server.register_function(getGrades)
 
     def saveAll(person_details):  # Saves new student data to database
@@ -184,6 +181,11 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
                 param = input("ID: ")
                 exists = isExistingStudent(param)
                 print(exists)
+            elif choice == "honours":
+                param = [('10496696', 'SCI1125', 96), ('10496696', 'CSP1150', 92), ('10496696', 'MAT1252', 92), ('10496696', 'CSI1241', 95), ('10496696', 'CSG1105', 86), ('10496696', 'CSI1101', 78), ('10496696', 'ENS1161', 94), ('10496696', 'CSG1207', 91),
+                         ('10496696', 'CSP2348', 86), ('10496696', 'CSP2104', 88), ('10496696', 'CSG2341', 90), ('10496696', 'CSG2344', 86), ('10496696', 'CSI3344', 76), ('10496696', 'CSP3341', 78), ('10496696', 'CSP2108', 75), ('10496696', 'CSI2312', 72)]
+                result = determineHonours(param)
+                print(result)
 
     # ! End developer area =======================================================
     else:
