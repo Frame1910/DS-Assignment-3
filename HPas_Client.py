@@ -114,7 +114,12 @@ def enterUnits():
 
 print("Welcome to the Honours Pre-assessment System (HPaS)")
 try:
-    s = xmlrpc.client.ServerProxy('http://0.0.0.0:8000')
+    address = input(
+        "Input the IP address of the host device, or leave empty if you only have one device:\n")
+    if address == "":
+        s = xmlrpc.client.ServerProxy('http://0.0.0.0:8000')
+    else:
+        s = xmlrpc.client.ServerProxy(address)
     print("Connected to server.")
 except:
     print("Could not connect to server.")
