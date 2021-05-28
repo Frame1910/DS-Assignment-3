@@ -90,7 +90,7 @@ elif user == "":
     password = input(
         "Enter MySQL Server password (leave blank for no password): ")
     db = Database(user, password)  # Instantiate Database interface object
-with SimpleXMLRPCServer(('0.0.0.0', 8000), requestHandler=RequestHandler) as server:
+with SimpleXMLRPCServer(('0.0.0.0', 8000,), requestHandler=RequestHandler, allow_none=True) as server:
     server.register_introspection_functions()
 
     # Stage 1 Methods =========================================================================================================

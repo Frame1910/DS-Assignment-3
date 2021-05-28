@@ -117,7 +117,7 @@ try:
     address = input(
         "Input the IP address of the host device, or leave empty if you only have one device:\n")
     if address == "":
-        s = xmlrpc.client.ServerProxy('http://0.0.0.0:8000')
+        s = xmlrpc.client.ServerProxy('http://0.0.0.0:8000', allow_none=True)
     else:
         s = xmlrpc.client.ServerProxy("http://" + address + ":8000")
     print("Connected to server.")
@@ -143,7 +143,7 @@ if s.isExistingStudent(person_id):
 else:
     unit_list = enterUnits()
     if unit_list == 0:
-            exit()
+        exit()
     save = yesNoInput(
         "Would you like to save these results in the HPaS Database?")
 
