@@ -3,7 +3,7 @@
 import xmlrpc.client
 
 
-def yesNoInput(msg):
+def yesNoInput(msg):  # Function for asking for yes or no input (we used y/n inputs enough to justify it)
     while True:
         choice = input(msg + " (y/n): ")
         if choice == "y":
@@ -43,7 +43,7 @@ def existingFails(existing_units, draft_unit):
     return fails
 
 
-def validateID():  # * Validates that an entered ID is 8 characters long and is numeric. However, it keeps it as a string to keep trailing zeros
+def validateID():  # Validates that an entered ID is 8 characters long and is numeric. However, it keeps it as a string to keep trailing zeros
     while True:
         id = input("Please enter your ID: ")
         if len(id) == 8 and id.isnumeric():
@@ -132,16 +132,16 @@ if s.isExistingStudent(person_id):
     else:
         unit_list = enterUnits()
         save = yesNoInput(
-            "Would you like to save these results in the HPaS Database?")
+            "Would you like to update the results in the HPaS Database with these new ones?")
 else:
     unit_list = enterUnits()
     save = yesNoInput(
         "Would you like to save these results in the HPaS Database?")
 
-# * At this point, the user has a valid ID, and has entered all units correctly
+# At this point, the user has a valid ID, and has entered all units correctly
 person_details.append(person_id)
 person_details.append(unit_list)
-if save:
+if save:  # If the user wants to save the details they've entered, they can
     s.saveAll(person_details)
-honours_result = s.determineHonours(person_details)
+honours_result = s.determineHonours(person_details)  # Honours result return
 print(honours_result)
